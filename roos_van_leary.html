@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roos van Leary — Zelfreflectie</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --border: #E2E0D8;
+    --border-focus: #2C5F8A;
+    --text: #1A1A18;
+    --text-muted: #6B6960;
+    --text-hint: #9B9890;
+    --accent: #2C5F8A;
+    --accent-light: #EAF1F8;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+  .container {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: .375rem;
+  }
+  .header p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* Steps */
+  .step { display: none; }
+  .step.active { display: block; }
+
+  /* Intro */
+  .intro-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .intro-card p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+  .scale-legend {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    margin-bottom: 0;
+  }
+  .scale-legend span {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .scale-legend strong { color: var(--text); }
+
+  /* Progress */
+  .progress-wrap { margin-bottom: 1.5rem; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-hint);
+    margin-bottom: .5rem;
+  }
+  .progress-bar-bg {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+  }
+  .progress-bar-fill {
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width .3s ease;
+  }
+
+  /* Question cards */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: .75rem;
+    transition: border-color .15s;
+  }
+  .q-card.answered { border-color: var(--accent); }
+  .q-meta {
+    font-size: 11px;
+    color: var(--text-hint);
+    margin-bottom: .375rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .score-pill {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: 20px;
+    padding: 1px 7px;
+  }
+  .q-text {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+  .scale-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scale-end {
+    font-size: 11px;
+    color: var(--text-hint);
+    min-width: 36px;
+    line-height: 1.3;
+  }
+  .scale-end.right { text-align: right; }
+  .scale-btns {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+  }
+  .s-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all .15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .s-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .s-btn.sel { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Warning */
+  .warn {
+    font-size: 13px;
+    color: #B85042;
+    margin-top: .75rem;
+    display: none;
+    padding: .5rem .75rem;
+    background: #FDF0EE;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Buttons */
+  .btn-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; }
+  .btn {
+    padding: 9px 22px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .15s;
+  }
+  .btn:hover { background: var(--bg); border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: #235078; border-color: #235078; color: #fff; }
+
+  /* Result */
+  .result-header { text-align: center; margin-bottom: 1.5rem; }
+  .result-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin-bottom: .25rem;
+  }
+  .result-header p { font-size: 14px; color: var(--text-muted); }
+
+  canvas#roos { display: block; margin: 0 auto 1.75rem; max-width: 100%; }
+
+  .axis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .625rem;
+    margin-bottom: 1.5rem;
+  }
+  .axis-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .75rem 1rem;
+  }
+  .axis-title { font-size: 12px; font-weight: 500; margin-bottom: .2rem; }
+  .axis-desc { font-size: 11px; color: var(--text-hint); }
+  .axis-bar-bg { height: 3px; border-radius: 2px; background: var(--bg); margin-top: .5rem; }
+  .axis-bar-fill { height: 3px; border-radius: 2px; }
+
+  .profile-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 1.75rem;
+  }
+  .profile-box strong { color: var(--text); }
+
+  .restart-btn {
+    display: block;
+    margin: 0 auto;
+    padding: 9px 22px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .15s;
+  }
+  .restart-btn:hover { background: var(--bg); color: var(--text); }
+
+  @media (max-width: 480px) {
+    .axis-grid { grid-template-columns: 1fr; }
+    .s-btn { width: 38px; height: 38px; font-size: 13px; }
+    .header h1 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Roos van Leary</h1>
+    <p>Zelfreflectie voor instructeurs</p>
+  </div>
+
+  <!-- Intro -->
+  <div class="step active" id="step-intro">
+    <div class="intro-card">
+      <p>24 stellingen over jouw gedrag als instructeur. Geef per stelling aan hoe vaak dit op jou van toepassing is. Er zijn geen goede of foute antwoorden — wees zo eerlijk mogelijk.</p>
+      <div class="scale-legend">
+        <span><strong>1</strong> = nooit</span>
+        <span><strong>2</strong> = soms</span>
+        <span><strong>3</strong> = neutraal</span>
+        <span><strong>4</strong> = vaak</span>
+        <span><strong>5</strong> = altijd</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="goPage(0)">Start →</button>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div class="step" id="step-q">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="page-info"></span>
+        <span id="page-count"></span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="pbar"></div></div>
+    </div>
+    <div id="q-container"></div>
+    <div class="warn" id="warn">Beantwoord alle vragen op deze pagina voor je verdergaat.</div>
+    <div class="btn-row">
+      <button class="btn" id="btn-prev" onclick="prevPage()">← Vorige</button>
+      <button class="btn primary" id="btn-next" onclick="nextPage()">Volgende →</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="step" id="step-result">
+    <div class="result-header">
+      <h2>Jouw Roos van Leary</h2>
+      <p>De roos toont 8 assen — elke as is de som van 3 vragen (max. 15).</p>
+    </div>
+    <canvas id="roos"></canvas>
+    <div class="axis-grid" id="axis-grid"></div>
+    <div class="profile-box" id="profile-text"></div>
+    <button class="restart-btn" onclick="restart()">↺ Opnieuw invullen</button>
+  </div>
+</div>
+
+<script>
+const questions=[
+  {text:"Ik ben zelf veel aan het woord tijdens de les",ax:"BS"},
+  {text:"Ik doe vriendelijk tegen cursisten",ax:"SB"},
+  {text:"Bij mij moet het stil zijn tijdens de les",ax:"TB"},
+  {text:"Ik zeg dat cursisten weinig presteren",ax:"TO"},
+  {text:"Als je het oneens met me bent, kun je dat met mij bepraten",ax:"SO"},
+  {text:"Ik ben bereid iets opnieuw uit te leggen",ax:"SO"},
+  {text:"Ik doe of cursisten niets weten",ax:"BT"},
+  {text:"Ik maak een onzekere indruk",ax:"OT"},
+  {text:"Ik maak opmerkingen die ten koste van cursisten gaan",ax:"TO"},
+  {text:"Als cursisten iets willen, probeer ik mee te werken",ax:"SO"},
+  {text:"Ik help cursisten bij het werken",ax:"SB"},
+  {text:"Ik dreig met straf of gevolgen",ax:"TB"},
+  {text:"Ik zie wat er in de groep gebeurt",ax:"BS"},
+  {text:"Of cursisten hun opdrachten maken, laat ik aan henzelf over",ax:"OS"},
+  {text:"Ik ga aan ordeverstoringen voorbij",ax:"OS"},
+  {text:"Ik leg duidelijk uit",ax:"BS"},
+  {text:"Ik vind veel goed en stel weinig grenzen",ax:"OS"},
+  {text:"Ik kan kwaad worden in de les",ax:"TB"},
+  {text:"Ik houd streng orde",ax:"BT"},
+  {text:"Met mij kun je gemakkelijk in conflict komen",ax:"TO"},
+  {text:"Er is bij mij een prettige sfeer in de les",ax:"SB"},
+  {text:"Ik laat goed merken wanneer iemand iets fout heeft gedaan",ax:"BT"},
+  {text:"Ik treedt aarzelend op",ax:"OT"},
+  {text:"Ik laat me door cursisten op de kop zitten",ax:"OT"},
+];
+
+const AXES=[
+  {key:'BS',label:'Boven-Samen',angle:-67.5,color:'#185FA5'},
+  {key:'SB',label:'Samen-Boven',angle:-22.5,color:'#0F6E56'},
+  {key:'SO',label:'Samen-Onder',angle: 22.5,color:'#0F6E56'},
+  {key:'OS',label:'Onder-Samen',angle: 67.5,color:'#854F0B'},
+  {key:'OT',label:'Onder-Tegen',angle:112.5,color:'#854F0B'},
+  {key:'TO',label:'Tegen-Onder',angle:157.5,color:'#6D2E46'},
+  {key:'TB',label:'Tegen-Boven',angle:-157.5,color:'#A32D2D'},
+  {key:'BT',label:'Boven-Tegen',angle:-112.5,color:'#A32D2D'},
+];
+
+const AX_INFO={
+  BS:{label:'Boven-Samen',color:'#185FA5',desc:'Leidend & coöperatief'},
+  SB:{label:'Samen-Boven',color:'#0F6E56',desc:'Coöperatief & leidend'},
+  SO:{label:'Samen-Onder',color:'#0F6E56',desc:'Coöperatief & volgend'},
+  OS:{label:'Onder-Samen',color:'#854F0B',desc:'Volgend & coöperatief'},
+  OT:{label:'Onder-Tegen',color:'#854F0B',desc:'Volgend & afstandelijk'},
+  TO:{label:'Tegen-Onder',color:'#6D2E46',desc:'Afstandelijk & volgend'},
+  TB:{label:'Tegen-Boven',color:'#A32D2D',desc:'Afstandelijk & leidend'},
+  BT:{label:'Boven-Tegen',color:'#A32D2D',desc:'Leidend & afstandelijk'},
+};
+
+const PROFILES={
+  BS:"Je dominante stijl is <strong>boven-samen</strong>: je neemt duidelijk de leiding én bent coöperatief. Cursisten ervaren je als toegankelijk en sturend tegelijk — een krachtige combinatie voor een instructeur.",
+  SB:"Je dominante stijl is <strong>samen-boven</strong>: je bent sterk gericht op samenwerking en neemt ook leiding. Je creëert een prettige werksfeer en wordt gezien als steunend.",
+  SO:"Je dominante stijl is <strong>samen-onder</strong>: je werkt graag mee en volgt. Prettig in de samenwerking, maar let erop dat je ook de regie pakt wanneer de situatie dat vraagt.",
+  OS:"Je dominante stijl is <strong>onder-samen</strong>: je bent volgzaam en vriendelijk ingesteld. Overweeg of je voldoende gezag uitstraalt, zeker bij groepen die meer sturing nodig hebben.",
+  OT:"Je dominante stijl is <strong>onder-tegen</strong>: je neemt weinig initiatief en trekt je terug. Probeer bewust meer aanwezig te zijn — cursisten hebben houvast nodig.",
+  TO:"Je dominante stijl is <strong>tegen-onder</strong>: je houdt afstand en volgt. Dit kan als onbetrokken worden ervaren. Meer openheid en leiderschap zal je contact met cursisten versterken.",
+  TB:"Je dominante stijl is <strong>tegen-boven</strong>: je stuurt strak aan en houdt afstand. Effectief voor structuur, maar pas op dat cursisten je niet als koud of onbereikbaar ervaren.",
+  BT:"Je dominante stijl is <strong>boven-tegen</strong>: je bent dominant en direct. Dat geeft duidelijkheid, maar combineer het met meer openheid om cursisten niet af te schrikken.",
+};
+
+const PER_PAGE=6;
+let answers=new Array(24).fill(0);
+let currentPage=0;
+const totalPages=Math.ceil(questions.length/PER_PAGE);
+const scaleLabels=Array(15).fill(["nooit","altijd"]).concat(Array(9).fill(["niet","heel erg"]));
+
+function goPage(p){
+  currentPage=p; renderPage();
+  document.getElementById('step-intro').classList.remove('active');
+  document.getElementById('step-q').classList.add('active');
+}
+
+function renderPage(){
+  const start=currentPage*PER_PAGE, end=Math.min(start+PER_PAGE,questions.length);
+  document.getElementById('pbar').style.width=((start/questions.length)*100)+'%';
+  document.getElementById('page-info').textContent=`Vragen ${start+1}–${end}`;
+  document.getElementById('page-count').textContent=`Pagina ${currentPage+1} van ${totalPages}`;
+  document.getElementById('btn-prev').style.visibility=currentPage===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=currentPage===totalPages-1?'Resultaat bekijken →':'Volgende →';
+  document.getElementById('warn').style.display='none';
+  let html='';
+  for(let i=start;i<end;i++){
+    const q=questions[i], done=answers[i]>0, lbls=scaleLabels[i];
+    html+=`<div class="q-card${done?' answered':''}" id="qcard-${i}">
+      <div class="q-meta">Vraag ${i+1} van ${questions.length}${done?` <span class="score-pill">${answers[i]}</span>`:''}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="scale-row">
+        <span class="scale-end">${lbls[0]}</span>
+        <div class="scale-btns">${[1,2,3,4,5].map(v=>`<button class="s-btn${answers[i]===v?' sel':''}" onclick="pick(${i},${v})">${v}</button>`).join('')}</div>
+        <span class="scale-end right">${lbls[1]}</span>
+      </div>
+    </div>`;
+  }
+  document.getElementById('q-container').innerHTML=html;
+}
+
+function pick(i,v){
+  answers[i]=v;
+  const card=document.getElementById(`qcard-${i}`);
+  card.classList.add('answered');
+  card.querySelector('.q-meta').innerHTML=`Vraag ${i+1} van ${questions.length} <span class="score-pill">${v}</span>`;
+  card.querySelectorAll('.s-btn').forEach((b,idx)=>b.classList.toggle('sel',idx+1===v));
+}
+
+function prevPage(){if(currentPage>0){currentPage--;renderPage();window.scrollTo(0,0);}}
+
+function nextPage(){
+  const start=currentPage*PER_PAGE, end=Math.min(start+PER_PAGE,questions.length);
+  for(let i=start;i<end;i++){if(answers[i]===0){document.getElementById('warn').style.display='block';return;}}
+  document.getElementById('warn').style.display='none';
+  if(currentPage<totalPages-1){currentPage++;renderPage();window.scrollTo(0,0);}
+  else showResult();
+}
+
+function calcScores(){
+  const s={BS:0,SB:0,SO:0,OS:0,OT:0,TO:0,TB:0,BT:0};
+  questions.forEach((q,i)=>s[q.ax]+=answers[i]);
+  return s;
+}
+
+function showResult(){
+  document.getElementById('step-q').classList.remove('active');
+  document.getElementById('step-result').classList.add('active');
+  const scores=calcScores();
+  drawRoos(scores);
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('axis-grid').innerHTML=sorted.map(([k,v])=>{
+    const info=AX_INFO[k];
+    return `<div class="axis-card">
+      <div class="axis-title" style="color:${info.color}">${info.label}</div>
+      <div class="axis-desc">${info.desc} — ${v} / 15</div>
+      <div class="axis-bar-bg"><div class="axis-bar-fill" style="width:${Math.round((v/15)*100)}%;background:${info.color}"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('profile-text').innerHTML=PROFILES[sorted[0][0]];
+}
+
+function drawRoos(scores){
+  const R=115, pad=66;
+  const W=2*(R+pad), H=2*(R+pad);
+  const c=document.getElementById('roos');
+  c.width=W; c.height=H;
+  const cx=W/2, cy=H/2;
+  const ctx=c.getContext('2d');
+
+  const gridCol='rgba(0,0,0,0.07)';
+  const axisCol='rgba(0,0,0,0.1)';
+  const textCol='#6B6960';
+  const cardinalCol='#1A1A18';
+
+  ctx.clearRect(0,0,W,H);
+
+  // grid rings
+  [3,6,9,12,15].forEach(v=>{
+    ctx.beginPath(); ctx.arc(cx,cy,(v/15)*R,0,Math.PI*2);
+    ctx.strokeStyle=gridCol; ctx.lineWidth=0.5; ctx.stroke();
+  });
+
+  // axis spokes
+  AXES.forEach(ax=>{
+    const rad=(ax.angle*Math.PI)/180;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(rad)*R,cy+Math.sin(rad)*R);
+    ctx.strokeStyle=axisCol; ctx.lineWidth=0.5; ctx.stroke();
+  });
+
+  // cardinal cross
+  [-90,0,90,180].forEach(deg=>{
+    const rad=deg*Math.PI/180;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(rad)*R,cy+Math.sin(rad)*R);
+    ctx.lineTo(cx-Math.cos(rad)*R,cy-Math.sin(rad)*R);
+    ctx.strokeStyle=axisCol; ctx.lineWidth=0.8; ctx.stroke();
+  });
+
+  // polygon
+  const pts=AXES.map(ax=>{
+    const v=scores[ax.key], r=(v/15)*R, rad=(ax.angle*Math.PI)/180;
+    return [cx+Math.cos(rad)*r, cy+Math.sin(rad)*r];
+  });
+  ctx.beginPath(); ctx.moveTo(pts[0][0],pts[0][1]);
+  pts.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
+  ctx.closePath();
+  ctx.fillStyle='rgba(44,95,138,0.15)'; ctx.fill();
+  ctx.strokeStyle='#2C5F8A'; ctx.lineWidth=2; ctx.stroke();
+  pts.forEach(p=>{
+    ctx.beginPath(); ctx.arc(p[0],p[1],4,0,Math.PI*2);
+    ctx.fillStyle='#2C5F8A'; ctx.fill();
+  });
+
+  // octant labels + scores
+  const lblR=R+20;
+  ctx.font='bold 11px "DM Sans", sans-serif';
+  AXES.forEach(ax=>{
+    const rad=(ax.angle*Math.PI)/180;
+    const lx=cx+Math.cos(rad)*lblR;
+    const ly=cy+Math.sin(rad)*lblR;
+    ctx.textAlign=lx<cx-4?'right':lx>cx+4?'left':'center';
+    ctx.fillStyle=ax.color;
+    ctx.fillText(ax.key,lx,ly);
+    ctx.font='10px "DM Sans", sans-serif';
+    ctx.fillStyle=textCol;
+    ctx.fillText(`(${scores[ax.key]})`,lx,ly+13);
+    ctx.font='bold 11px "DM Sans", sans-serif';
+  });
+
+  // Cardinal labels
+  ctx.font='bold 12px "DM Sans", sans-serif';
+  ctx.fillStyle=cardinalCol;
+  ctx.textAlign='center'; ctx.fillText('BOVEN',cx,pad-10);
+  ctx.textAlign='center'; ctx.fillText('ONDER',cx,H-pad+22);
+  ctx.textAlign='left';   ctx.fillText('TEGEN',4,cy+4);
+  ctx.textAlign='right';  ctx.fillText('SAMEN',W-4,cy+4);
+}
+
+function restart(){
+  answers=new Array(24).fill(0); currentPage=0;
+  document.getElementById('step-result').classList.remove('active');
+  document.getElementById('step-intro').classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
